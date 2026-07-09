@@ -21,15 +21,6 @@ internal var eventModifier: Int = 0
 
 internal var horizontalScroller: ((Double, Double, Double) -> Unit)? = null
 
-/**
- * Public marker interface implemented by every Screen this backend creates, so mod code can
- * set [onRawKeyPressed] via `(holder.screen as? DslRawKeyHandler)?.onRawKeyPressed = { ... }`
- * without needing an internal/anonymous type. See its KDoc below for why this hook exists.
- */
-interface DslRawKeyHandler {
-    var onRawKeyPressed: ((net.minecraft.client.input.KeyEvent) -> Boolean)?
-}
-
 @InternalBackend
 val defaultBackend: DslBackend<GuiGraphicsExtractor, Screen> = object : DslBackend<GuiGraphicsExtractor, Screen>,
     DslBackendRenderer<GuiGraphicsExtractor> by renderer,
@@ -42,7 +33,7 @@ val defaultBackend: DslBackend<GuiGraphicsExtractor, Screen> = object : DslBacke
                 Minecraft.getInstance().setScreen(screen)
             }
         }
-        override val screen = object : Screen(Component.literal(title)), DslScaleContext, DslRawKeyHandler {
+        override val screen = object : Screen(Component.literal(title)), DslScaleContext {
             override val scale get() = guiScale
             val parent = Minecraft.getInstance().screen
             fun DslBackend<*, *>.createDataStore() = DslDataStore(this, title, {
@@ -50,18 +41,6 @@ val defaultBackend: DslBackend<GuiGraphicsExtractor, Screen> = object : DslBacke
             }, dslFunction)
             val dataStore = createDataStore()
             val dslScreen = dataStore.dslScreen
-
-            // Escape hatch for raw key events that must be observed even when nothing in the
-            // DSL tree consumes them via dslScreen.keyDown (e.g. matching a vanilla KeyMapping
-            // like the inventory-open key). Confirmed from real Minecraft.tick() source:
-            // KeyMapping click tracking only runs via handleKeybinds(), which is itself gated
-            // by `this.screen == null` - so polling KeyMapping.consumeClick() from a mod's own
-            // tick handler can never see clicks while our own Screen is open. Mod code sets this
-            // via `(holder.screen as DslRawKeyHandler).onRawKeyPressed = { event -> ... }`.
-            // Checked only after dslScreen.keyDown() has had first chance to consume the event,
-            // so it never steals input from focused DSL widgets (e.g. text fields).
-            override var onRawKeyPressed: ((net.minecraft.client.input.KeyEvent) -> Boolean)? = null
-
             override fun onClose() {
                 horizontalScroller = null
                 dslScreen.close()
@@ -71,7 +50,6 @@ val defaultBackend: DslBackend<GuiGraphicsExtractor, Screen> = object : DslBacke
 
             override fun keyPressed(event: net.minecraft.client.input.KeyEvent): Boolean {
                 if (context(EventModifier(event.modifiers())) { dslScreen.keyDown(event.key(), event.scancode()) }) return true
-                if (onRawKeyPressed?.invoke(event) == true) return true
                 return super.keyPressed(event)
             }
 

@@ -1,45 +1,40 @@
-# gradle
+# Gradle build artifacts
+/build/
+/.gradle/
+!gradle/wrapper/gradle-wrapper.jar
 
-.gradle/
-build/
-out/
-classes/
 
-# eclipse
-
-*.launch
-
-# idea
-
-.idea/
+# IDE files (IntelliJ IDEA & Eclipse)
+/.idea/
 *.iml
 *.ipr
 *.iws
+/.settings/
+/.project/
+/.classpath/
+/bin/
+/.kotlin/
 
-# vscode
+# Visual Studio Code data
+/.vscode/
 
-.settings/
-.vscode/
-bin/
-.classpath
-.project
+# Local Minecraft runtime environments (test worlds, configs, and logs)
+/run/
+/runClient/
+/runServer/
+/runData/
+/runGameTest/
+/gamedir/
+/logs/
+/saves/
+/crash-reports/
+/usernamecache.json
 
-# macos
+# Operating System overhead files
+.DS_Store
+Thumbs.db
 
-*.DS_Store
-
-# fabric
-
-run/
-
-# java
-
-hs_err_*.log
-replay_*.log
-*.hprof
-*.jfr
-
-.kotlin/
-.profileconfig.json
-
-runs/
+# Output compiled packages
+*.jar
+!*sources.jar
+!*javadoc.jar
