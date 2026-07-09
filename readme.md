@@ -9,7 +9,7 @@ This mod acts as a connection between a mod that uses the frontend **[KotlinMCUI
 
 # Docs:
 
-### [English New Docs](https://stratcube2.github.io/kotlindocs/#home) (Translation)
+### [English Docs(fo' me)](https://stratcube2.github.io/kotlindocs/#home) (Translation)
 ### [Original Docs CN](https://2894638479.github.io/KotlinMCUI/)
 
 ---
