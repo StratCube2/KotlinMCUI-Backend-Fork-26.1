@@ -1,4 +1,6 @@
 # KotlinMCUI-backend
+**NOTE: The original mod has been updated to newer versions such as 1.21.1, 26.1, and 26.2. This was made by me for my mc mods [Backends updated](https://modrinth.com/mod/kotlinmcui-backend/versions)**
+
 This is a backend mod for the KotlinMCUI mod, which has been ported to 26.1+ versions. The mod KotlinMCUI and KotlinMCUI-backend are both made by **[2894638479](https://modrinth.com/user/2894638479)**
 
 This mod is a library mod, it doesn't add anything by itself, it lets other mods add things easier.
