@@ -184,11 +184,25 @@ internal val renderer = object : DslBackendRenderer<GuiGraphicsExtractor> {
         
         val u = uv.left.raw.toFloat()
         val v = uv.top.raw.toFloat()
+        // Real GuiGraphicsExtractor.java has no 4-arg-uv overload - "uv" here is a Rect only
+        // because DslBackendRenderer's interface uses Rect for it; srcWidth/srcHeight must be
+        // read from uv.width/uv.height explicitly, since the 11-arg blit() overload silently
+        // forces srcWidth=destW/srcHeight=destH instead (confirmed real source, line 295-296:
+        // `blit(rp, tex, x, y, u, v, width, height, textureWidth, textureHeight, color)` calls
+        // through to `blit(rp, tex, x, y, u, v, width, height, width, height, textureWidth,
+        // textureHeight, color)` - width/height reused as srcWidth/srcHeight). That collapsed
+        // every nine-slice UV rect (corners/edges/middle each need a fixed, independent source
+        // size) down to sampling a region sized to the destination rect instead - for the
+        // stretched middle slice on large clusters this sampled far outside the 24x24
+        // panel.png, producing garbage/empty pixels and the "fragmented, seamed panel" bug.
+        val srcW = uv.width.raw.toInt()
+        val srcH = uv.height.raw.toInt()
 
         val imgW = image.width.raw.toInt()
         val imgH = image.height.raw.toInt()
-        
-        // Correct 11-argument blit method signature for 26.1, including direct ARGB tint
+
+        // Real 13-argument overload (line 307 of GuiGraphicsExtractor.java) - the only one that
+        // takes srcWidth/srcHeight independently of destination width/height.
         renderParam.blit(
             RenderPipelines.GUI_TEXTURED,
             Identifier.parse(image.id),
@@ -198,6 +212,8 @@ internal val renderer = object : DslBackendRenderer<GuiGraphicsExtractor> {
             v,
             destW,
             destH,
+            srcW,
+            srcH,
             imgW,
             imgH,
             color.argbInt
