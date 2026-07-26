@@ -184,15 +184,11 @@ internal val renderer = object : DslBackendRenderer<GuiGraphicsExtractor> {
         
         val u = uv.left.raw.toFloat()
         val v = uv.top.raw.toFloat()
-        // It was 13 not 11.
-        val srcW = uv.width.raw.toInt()
-        val srcH = uv.height.raw.toInt()
 
         val imgW = image.width.raw.toInt()
         val imgH = image.height.raw.toInt()
-
-        // Real 13-argument overload (line 307 of GuiGraphicsExtractor.java) - the only one that
-        // takes srcWidth/srcHeight independently of destination width/height.
+        
+        // Correct 11-argument blit method signature for 26.1, including direct ARGB tint
         renderParam.blit(
             RenderPipelines.GUI_TEXTURED,
             Identifier.parse(image.id),
@@ -202,8 +198,6 @@ internal val renderer = object : DslBackendRenderer<GuiGraphicsExtractor> {
             v,
             destW,
             destH,
-            srcW,
-            srcH,
             imgW,
             imgH,
             color.argbInt
